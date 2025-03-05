@@ -894,8 +894,9 @@ export const extractSentences = (text: string) => {
 		return placeholder;
 	});
 
-	// Split the modified text into sentences based on common punctuation marks or newlines, avoiding these blocks
-	let sentences = text.split(/(?<=[.!?])\s+|\n+/);
+<<<<<<< HEAD
+	// Split the modified text into sentences based on common punctuation marks, avoiding these blocks
+	let sentences = text.split(/(?<=[.!?])\s+|(?<=[。！？])/);
 
 	// Restore code blocks and process sentences
 	sentences = sentences.map((sentence) => {
@@ -934,8 +935,13 @@ export const extractSentencesForAudio = (text: string) => {
 		const lastIndex = mergedTexts.length - 1;
 		if (lastIndex >= 0) {
 			const previousText = mergedTexts[lastIndex];
-			const wordCount = previousText.split(/\s+/).length;
+			let wordCount = previousText.split(/\s+/).length;
 			const charCount = previousText.length;
+
+			const isCJK = /[\u4e00-\u9fa5\u3040-\u30ff\u31f0-\u31ff\u3400-\u4dbf\u4e00-\u9fff\uF900-\uFAFF]/.test(previousText);
+			if (isCJK) {
+				wordCount = charCount * 3;
+			}
 			if (wordCount < 4 || charCount < 50) {
 				mergedTexts[lastIndex] = previousText + ' ' + currentText;
 			} else {
