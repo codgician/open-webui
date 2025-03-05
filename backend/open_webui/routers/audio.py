@@ -65,6 +65,20 @@ MAX_FILE_SIZE_MB = 20
 MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024  # Convert MB to bytes
 AZURE_MAX_FILE_SIZE_MB = 200
 AZURE_MAX_FILE_SIZE = AZURE_MAX_FILE_SIZE_MB * 1024 * 1024  # Convert MB to bytes
+# Defaults for FishSpeech TTS payload; adjust here to tune synthesis behaviour
+FISHSPEECH_TTS_PARAMS = {
+    "chunk_length": 200,
+    "format": "mp3",
+    "references": [],
+    "seed": None,
+    "use_memory_cache": "on",
+    "normalize": True,
+    "streaming": False,
+    "max_new_tokens": 1024,
+    "top_p": 0.7,
+    "repetition_penalty": 1.2,
+    "temperature": 0.7,
+}
 
 log = logging.getLogger(__name__)
 
@@ -581,28 +595,20 @@ async def speech(request: Request, user=Depends(get_verified_user)):
         return FileResponse(file_path)
     
     elif request.app.state.config.TTS_ENGINE == "fishspeech":
+        r = None
         try:
+            fishspeech_payload = {
+                **FISHSPEECH_TTS_PARAMS,
+                "text": payload["input"],
+                "reference_id": request.app.state.config.TTS_VOICE,
+            }
             timeout = aiohttp.ClientTimeout(total=AIOHTTP_CLIENT_TIMEOUT)
             async with aiohttp.ClientSession(
                 timeout=timeout, trust_env=True
             ) as session:
                 async with session.post(
                     url=f"{request.app.state.config.TTS_OPENAI_API_BASE_URL}/tts",
-                    json={
-                        "text": payload["input"],
-                        "chunk_length": 200,
-                        "format": "mp3",
-                        "references": [],
-                        "reference_id": request.app.state.config.TTS_VOICE,
-                        "seed": None,
-                        "use_memory_cache": "on",
-                        "normalize": True,
-                        "streaming": False,
-                        "max_new_tokens": 1024,
-                        "top_p": 0.7,
-                        "repetition_penalty": 1.2,
-                        "temperature": 0.7
-                    },
+                    json=fishspeech_payload,
                     headers={
                         "Content-Type": "application/json",
                         "Authorization": f"Bearer {request.app.state.config.TTS_API_KEY}",
@@ -633,7 +639,7 @@ async def speech(request: Request, user=Depends(get_verified_user)):
             detail = None
 
             try:
-                if r.status != 200:
+                if r is not None:
                     res = await r.json()
 
                     if "error" in res:

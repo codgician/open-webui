@@ -882,6 +882,8 @@ export const processDetails = (content) => {
 
 // This regular expression matches code blocks marked by triple backticks
 const codeBlockRegex = /```[\s\S]*?```/g;
+const CJK_REGEX = /[\u3040-\u30ff\u31f0-\u31ff\u3400-\u9fff\uAC00-\uD7AF\uF900-\uFAFF]/;
+const CJK_CHAR_DENSITY_MULTIPLIER = 10;
 
 export const extractSentences = (text: string) => {
 	const codeBlocks: string[] = [];
@@ -895,7 +897,8 @@ export const extractSentences = (text: string) => {
 	});
 
 	// Split the modified text into sentences based on common punctuation marks, avoiding these blocks
-	let sentences = text.split(/(?<=[.!?])\s+|(?<=[。！？])/);
+	// Use optional whitespace for CJK punctuation because text often omits spaces after these marks
+	let sentences = text.split(/(?<=[.!?])\s+|(?<=[。！？])\s*/);
 
 	// Restore code blocks and process sentences
 	sentences = sentences.map((sentence) => {
@@ -937,10 +940,11 @@ export const extractSentencesForAudio = (text: string) => {
 			let wordCount = previousText.split(/\s+/).length;
 			let charCount = previousText.length;
 
-			const isCJK = /[\u4e00-\u9fa5\u3040-\u30ff\u31f0-\u31ff\u3400-\u4dbf\u4e00-\u9fff\uF900-\uFAFF]/.test(previousText);
+			const isCJK = CJK_REGEX.test(previousText);
 			if (isCJK) {
+				// Treat CJK content as denser because it lacks whitespace delimiters
 				wordCount = charCount;
-				charCount = charCount * 10;
+				charCount = charCount * CJK_CHAR_DENSITY_MULTIPLIER;
 			}
 			if (wordCount < 4 || charCount < 50) {
 				mergedTexts[lastIndex] = previousText + ' ' + currentText;

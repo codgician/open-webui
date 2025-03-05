@@ -594,7 +594,7 @@
 								placeholder={$i18n.t('API Base URL')}
 								bind:value={TTS_OPENAI_API_BASE_URL}
 								required
-								title="fishspeech api base url like https://api.fish.audio/v1"
+								title="FishSpeech API base url like https://api.fish.audio/v1"
 							/>
 
 							<SensitiveInput placeholder={$i18n.t('API Key')} bind:value={TTS_API_KEY} />
@@ -807,45 +807,41 @@
 							</div>
 						</div>
 					{:else if TTS_ENGINE === 'fishspeech'}
-					<div class=" flex gap-2">
-						<div class="w-full">
-							<div class=" mb-1.5 text-sm font-medium">{$i18n.t('TTS Voice')}</div>
-							<div class="flex w-full">
-								<div class="flex-1">
-									<input
-										list="voice-list"
-										class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
-										bind:value={TTS_VOICE}
-										placeholder="Input fishspeech reference voice id"
-									/>
+						<div class="flex gap-2">
+							<div class="w-full">
+								<div class=" mb-1.5 text-sm font-medium">{$i18n.t('TTS Voice')}</div>
+								<div class="flex w-full">
+									<div class="flex-1">
+										<input
+											list="voice-list"
+											class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
+											bind:value={TTS_VOICE}
+											placeholder="Input FishSpeech reference voice id"
+										/>
+									</div>
+								</div>
+								<div class="mt-2 mb-1 text-xs text-gray-400 dark:text-gray-500">
+									Usage of the reference voice ID can be found in the FishSpeech documentation.
+									<a
+										class=" hover:underline dark:text-gray-200 text-gray-800"
+										href="https://docs.fish.audio/api-reference/endpoint/openapi-v1/text-to-speech#body-reference-id"
+										target="_blank"
+									>
+										{$i18n.t(`click here`)}.
+									</a>
+
+									To learn more about FishSpeech,
+									<a
+										class=" hover:underline dark:text-gray-200 text-gray-800"
+										href="https://fish.audio/"
+										target="_blank"
+									>
+										{$i18n.t(`click here`)}.
+									</a>
 								</div>
 							</div>
-							<div class="mt-2 mb-1 text-xs text-gray-400 dark:text-gray-500">
-								The usage of reference voice id can be found in the fishspeech documentation.,
-								<a
-									class=" hover:underline dark:text-gray-200 text-gray-800"
-									href="https://docs.fish.audio/api-reference/endpoint/openapi-v1/text-to-speech#body-reference-id"
-									target="_blank"
-								>
-									{$i18n.t(`click here`)}.
-								</a>
-
-								To learn more about fishspeech,
-	
-								<a
-									class=" hover:underline dark:text-gray-200 text-gray-800"
-									href="https://fish.audio/"
-									target="_blank"
-								>
-									{$i18n.t(`click here`, {
-										name: 'fishspeech'
-									})}.
-								</a>
-
-							</div>
 						</div>
-					</div>
-				{/if}
+					{/if}
 				</div>
 
 				<div class="pt-0.5 flex w-full justify-between">
